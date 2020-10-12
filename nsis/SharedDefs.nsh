@@ -44,9 +44,6 @@ Function IsUserAdmin
   ${IfNot} ${AtLeastWinVista}
     MessageBox MB_OK "Your operating system is unsupported by PCSX2. Please upgrade your operating system or install PCSX2 1.4.0."
     Quit
-  ${ElseIfNot} ${AtLeastWin8.1}
-    MessageBox MB_OK "Your operating system is unsupported by PCSX2. Please upgrade your operating system or install PCSX2 1.6.0."
-    Quit
   ${EndIf}
 
 UserInfo::GetOriginalAccountType
@@ -56,7 +53,7 @@ Pop $UserPrivileges
   # current thread/process. If the user tokens were elevated or limited for
   # this process, GetOriginalAccountType will return the non-restricted
   # account type.
-  # On Windows with UAC, for example, this is not the same value when running
+  # On Vista with UAC, for example, this is not the same value when running
   # with `RequestExecutionLevel user`. GetOriginalAccountType will return
   # "admin" while GetAccountType will return "user".
   ;UserInfo::GetOriginalAccountType
@@ -64,7 +61,7 @@ Pop $UserPrivileges
 
 ${If} $UserPrivileges == "Admin"
     StrCpy $IsAdmin 1
-${ElseIf} $UserPrivileges == "User"
+    ${ElseIf} $UserPrivileges == "User"
     StrCpy $IsAdmin 0
 ${EndIf}
 FunctionEnd
@@ -119,5 +116,5 @@ Function .onInit
     StrCpy $option_portable 1
 
     Pop $R0
-    
+
 FunctionEnd
