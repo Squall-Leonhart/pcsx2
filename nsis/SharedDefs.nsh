@@ -43,12 +43,9 @@ Function IsUserAdmin
 # No user should ever have to experience this pain ;)
   ${IfNot} ${AtLeastWinVista}
     MessageBox MB_OK "Your operating system is unsupported by PCSX2. Please upgrade your operating system or install PCSX2 1.4.0."
-<<<<<<< HEAD
     Quit
   ${ElseIfNot} ${AtLeastWin8.1}
     MessageBox MB_OK "Your operating system is unsupported by PCSX2. Please upgrade your operating system or install PCSX2 1.6.0."
-=======
->>>>>>> parent of 441602aee... nsis: Bump minimum Windows requirement to 8.1
     Quit
   ${EndIf}
 
@@ -59,7 +56,7 @@ Pop $UserPrivileges
   # current thread/process. If the user tokens were elevated or limited for
   # this process, GetOriginalAccountType will return the non-restricted
   # account type.
-  # On Vista with UAC, for example, this is not the same value when running
+  # On Windows with UAC, for example, this is not the same value when running
   # with `RequestExecutionLevel user`. GetOriginalAccountType will return
   # "admin" while GetAccountType will return "user".
   ;UserInfo::GetOriginalAccountType
