@@ -83,29 +83,6 @@ endif()
 
 
 #---------------------------------------
-#			dev9null
-#---------------------------------------
-if(GTKn_FOUND)
-    set(dev9null TRUE)
-endif()
-
-#---------------------------------------
-#			dev9ghzdrk
-#---------------------------------------
-if(NOT DISABLE_DEV9GHZDRK)
-if(GTKn_FOUND AND PCAP_FOUND AND LIBXML2_FOUND)
-    set(dev9ghzdrk TRUE)
-    list(APPEND CMAKE_MODULE_PATH
-        ${CMAKE_MODULE_PATH}/macros)
-    include(GlibCompileResourcesSupport) 
-else()
-    set(dev9ghzdrk FALSE)
-    print_dep("Skip build of dev9ghzdrk: missing dependencies" "${msg_dep_dev}")
-endif()
-endif()
-#---------------------------------------
-
-#---------------------------------------
 #			GSnull
 #---------------------------------------
 if(GTKn_FOUND AND EXTRA_PLUGINS)
@@ -121,7 +98,7 @@ endif()
 #           -X11
 #           -zlib
 #---------------------------------------
-if(OPENGL_FOUND AND X11_FOUND AND GTKn_FOUND AND ZLIB_FOUND AND PNG_FOUND AND FREETYPE_FOUND AND LIBLZMA_FOUND AND EGL_FOUND AND X11_XCB_FOUND)
+if(OPENGL_FOUND AND X11_FOUND AND GTKn_FOUND AND ZLIB_FOUND AND PNG_FOUND AND FREETYPE_FOUND AND LIBLZMA_FOUND AND ((EGL_FOUND AND X11_XCB_FOUND) OR APPLE))
     set(GSdx TRUE)
 elseif(NOT EXISTS "${CMAKE_SOURCE_DIR}/plugins/GSdx")
     set(GSdx FALSE)
@@ -178,11 +155,4 @@ else()
 endif()
 #---------------------------------------
 
-#---------------------------------------
-#			USBnull
-#---------------------------------------
-if(GTKn_FOUND)
-    set(USBnull TRUE)
-endif()
-#---------------------------------------
 #-------------------------------------------------------------------------------

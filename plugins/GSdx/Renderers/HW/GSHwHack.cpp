@@ -834,9 +834,11 @@ bool GSC_GetaWayGames(const GSFrameInfo& fi, int& skip)
 	return true;
 }
 
-bool GSC_StarOcean3(const GSFrameInfo& fi, int& skip)
+bool GSC_TriAceGames(const GSFrameInfo& fi, int& skip)
 {
-	// The game emulate a stencil buffer with the alpha channel of the RT
+	// Tri Ace Games: ValkyrieProfile2, RadiataStories, StarOcean3
+	//
+	// The games emulate a stencil buffer with the alpha channel of the RT
 	// The operation of the stencil is selected with the palette
 	// For example -1 wrap will be [240, 16, 32, 48 ....]
 	// i.e. p[A>>4] = (A - 16) % 256
@@ -853,48 +855,6 @@ bool GSC_StarOcean3(const GSFrameInfo& fi, int& skip)
 	{
 		if (fi.TME && fi.FBP == fi.TBP0 && fi.FPSM == PSM_PSMCT32 && fi.TPSM == PSM_PSMT4HH)
 		{
-			skip = 1000; //
-		}
-	}
-	else
-	{
-		if (!(fi.TME && fi.FBP == fi.TBP0 && fi.FPSM == PSM_PSMCT32 && fi.TPSM == PSM_PSMT4HH))
-		{
-			skip = 0;
-		}
-	}
-
-	return true;
-}
-
-bool GSC_ValkyrieProfile2(const GSFrameInfo& fi, int& skip)
-{
-	if (skip == 0)
-	{
-		if (fi.TME && fi.FBP == fi.TBP0 && fi.FPSM == PSM_PSMCT32 && fi.TPSM == PSM_PSMT4HH)
-		{
-			// GH: Hack is quite similar to GSC_StarOcean3. It is potentially the same issue.
-			skip = 1000; //
-		}
-	}
-	else
-	{
-		if (!(fi.TME && fi.FBP == fi.TBP0 && fi.FPSM == PSM_PSMCT32 && fi.TPSM == PSM_PSMT4HH))
-		{
-			skip = 0;
-		}
-	}
-
-	return true;
-}
-
-bool GSC_RadiataStories(const GSFrameInfo& fi, int& skip)
-{
-	if (skip == 0)
-	{
-		if (fi.TME && fi.FBP == fi.TBP0 && fi.FPSM == PSM_PSMCT32 && fi.TPSM == PSM_PSMT4HH)
-		{
-			// GH: Hack is quite similar to GSC_StarOcean3. It is potentially the same issue.
 			skip = 1000;
 		}
 	}
@@ -961,20 +921,6 @@ bool GSC_AceCombat4(const GSFrameInfo& fi, int& skip)
 		if (fi.TME && fi.FBP == 0x02a00 && fi.FPSM == PSM_PSMZ24 && fi.TBP0 == 0x01600 && fi.TPSM == PSM_PSMZ24)
 		{
 			skip = 71; // clouds (z, 16-bit)
-		}
-	}
-
-	return true;
-}
-
-bool GSC_BleachBladeBattlers(const GSFrameInfo& fi, int& skip)
-{
-	if (skip == 0)
-	{
-		if (fi.TME && fi.FBP == 0x01180 && fi.FPSM == fi.TPSM && fi.TBP0 == 0x03fc0 && fi.TPSM == PSM_PSMCT32)
-		{
-			// Removes body shading. Not needed but offers a very decent speed boost.
-			skip = 1;
 		}
 	}
 
@@ -1216,15 +1162,14 @@ void GSState::SetupCrcHack()
 		// These games emulate a stencil buffer with the alpha channel of the RT (too slow to move to Aggressive)
 		// Needs at least Basic Blending,
 		// see https://github.com/PCSX2/pcsx2/pull/2921
-		lut[CRC::RadiataStories] = GSC_RadiataStories;
-		lut[CRC::StarOcean3] = GSC_StarOcean3;
-		lut[CRC::ValkyrieProfile2] = GSC_ValkyrieProfile2;
+		lut[CRC::RadiataStories] = GSC_TriAceGames;
+		lut[CRC::StarOcean3] = GSC_TriAceGames;
+		lut[CRC::ValkyrieProfile2] = GSC_TriAceGames;
 	}
 
 	if (Aggressive)
 	{
 		lut[CRC::AceCombat4] = GSC_AceCombat4;
-		lut[CRC::BleachBladeBattlers] = GSC_BleachBladeBattlers;
 		lut[CRC::FFX2] = GSC_FFXGames;
 		lut[CRC::FFX] = GSC_FFXGames;
 		lut[CRC::FFXII] = GSC_FFXGames;

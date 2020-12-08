@@ -21,6 +21,8 @@
 #include "GSFrame.h"
 #include "SPU2/spu2.h"
 #include "System/SysThreads.h"
+#include "DEV9/DEV9.h"
+#include "USB/USB.h"
 
 #include "ConsoleLogger.h"
 #include "MainFrame.h"
@@ -58,7 +60,17 @@ void MainEmuFrame::Menu_McdSettings_Click(wxCommandEvent& event)
 	AppOpenModalDialog<McdConfigDialog>(wxEmptyString, this);
 }
 
-void MainEmuFrame::Menu_WindowSettings_Click(wxCommandEvent& event)
+void MainEmuFrame::Menu_NetworkSettings_Click(wxCommandEvent &event)
+{
+	DEV9configure();
+}
+
+void MainEmuFrame::Menu_USBSettings_Click(wxCommandEvent& event)
+{
+	USBconfigure();
+}
+
+void MainEmuFrame::Menu_WindowSettings_Click(wxCommandEvent &event)
 {
 	wxCommandEvent evt(pxEvt_SetSettingsPage);
 	evt.SetString(L"GS Window");
@@ -411,7 +423,19 @@ void MainEmuFrame::_DoBootCdvd()
 			return;
 		}
 	}
+	
+	if (!g_Conf->EmuOptions.FullBootConfig && g_Conf->EmuOptions.UseBOOT2Injection)
+	{
+		g_Conf->EmuOptions.UseBOOT2Injection = false;
+		g_Conf->EmuOptions.FullBootConfig = true;
 
+		wxString message;
+		message.Printf(_("For the first run of this version of the emulator, you will be forced to boot to your BIOS. You are required to configure the BIOS language before proceeding. Once this has been done you can Fast Boot normally."));
+		Msgbox::Alert(message, _("BIOS Configuration"));
+	}
+	else
+		g_Conf->EmuOptions.FullBootConfig = true;
+	
 	sApp.SysExecute(g_Conf->CdvdSource);
 }
 
@@ -917,6 +941,26 @@ void MainEmuFrame::Menu_Capture_Screenshot_Screenshot_Click(wxCommandEvent& even
 		return;
 	}
 	GSmakeSnapshot(g_Conf->Folders.Snapshots.ToAscii());
+}
+
+void MainEmuFrame::Menu_Capture_Screenshot_Screenshot_As_Click(wxCommandEvent &event)
+{
+	if (!CoreThread.IsOpen())
+		return;
+
+	// Ensure emulation is paused so that the correct image is captured
+	bool wasPaused = CoreThread.IsPaused();
+	if (!wasPaused)
+		CoreThread.Pause();
+
+	wxFileDialog fileDialog(this, _("Select a file"), g_Conf->Folders.Snapshots.ToAscii(), wxEmptyString, "PNG files (*.png)|*.png", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	if (fileDialog.ShowModal() == wxID_OK)
+		GSmakeSnapshot(fileDialog.GetPath());
+
+	// Resume emulation
+	if (!wasPaused)
+		CoreThread.Resume();
 }
 
 #ifndef DISABLE_RECORDING

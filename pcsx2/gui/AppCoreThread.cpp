@@ -29,10 +29,15 @@
 
 #include "CDVD/CDVD.h"
 #include "SPU2/spu2.h"
+#include "USB/USB.h"
 #include "Elfheader.h"
 #include "Patch.h"
 #include "R5900Exceptions.h"
 #include "Sio.h"
+
+#ifndef DISABLE_RECORDING
+#include "Recording/InputRecordingControls.h"
+#endif
 
 __aligned16 SysMtgsThread mtgsThread;
 __aligned16 AppCoreThread CoreThread;
@@ -208,8 +213,16 @@ void Pcsx2App::SysApplySettings()
 
 void AppCoreThread::OnResumeReady()
 {
+#ifndef DISABLE_RECORDING
+	if (!g_InputRecordingControls.IsFrameAdvancing())
+	{
+		wxGetApp().SysApplySettings();
+		wxGetApp().PostMethod(AppSaveSettings);
+	}
+#else
 	wxGetApp().SysApplySettings();
 	wxGetApp().PostMethod(AppSaveSettings);
+#endif
 
 	sApp.PostAppMethod(&Pcsx2App::leaveDebugMode);
 	_parent::OnResumeReady();

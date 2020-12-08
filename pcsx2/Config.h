@@ -17,14 +17,16 @@
 
 #include "x86emitter/tools.h"
 
+#include "Utilities/FixedPointTypes.h"
+#include "Utilities/General.h"
+#include <wx/filename.h>
+
 class IniInterface;
 
 enum PluginsEnum_t
 {
 	PluginId_GS = 0,
 	PluginId_PAD,
-	PluginId_USB,
-	PluginId_DEV9,
 	PluginId_Count,
 
 	// Memorycard plugin support is preliminary, and is only hacked/hardcoded in at this
@@ -466,7 +468,8 @@ struct Pcsx2Config
 			MultitapPort1_Enabled:1,
 
 			ConsoleToStdio		:1,
-			HostFs				:1;
+			HostFs				:1,
+			FullBootConfig		:1;
 	BITFIELD_END
 
 	CpuOptions			Cpu;

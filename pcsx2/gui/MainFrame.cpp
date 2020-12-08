@@ -248,6 +248,8 @@ void MainEmuFrame::ConnectMenus()
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_McdSettings_Click, this, MenuId_Config_McdSettings);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_SelectPluginsBios_Click, this, MenuId_Config_BIOS);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_AudioSettings_Click, this, MenuId_Config_SPU2);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_NetworkSettings_Click, this, MenuId_Config_DEV9);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_USBSettings_Click, this, MenuId_Config_USB);
 
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_GSSettings_Click, this, MenuId_Video_CoreSettings);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_WindowSettings_Click, this, MenuId_Video_WindowSettings);
@@ -279,7 +281,8 @@ void MainEmuFrame::ConnectMenus()
 	// Capture
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Capture_Video_Record_Click, this, MenuId_Capture_Video_Record);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Capture_Video_Stop_Click, this, MenuId_Capture_Video_Stop);
-	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Capture_Screenshot_Screenshot_Click, this, MenuId_Capture_Screenshot);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Capture_Screenshot_Screenshot_Click, this, MenuId_Capture_Screenshot_Screenshot);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Capture_Screenshot_Screenshot_As_Click, this, MenuId_Capture_Screenshot_Screenshot_As);
 
 #ifndef DISABLE_RECORDING
 	// Recording
@@ -366,7 +369,7 @@ void MainEmuFrame::CreatePcsx2Menu()
 	m_menuSys.FindItem(MenuId_Sys_Shutdown)->Enable(false);
 
 	m_menuSys.Append(MenuId_Boot_ELF, _("&Run ELF..."),
-					 _("For running raw PS2 binaries directly"));
+					 _("For running raw PS2 binaries directly."));
 
 	m_menuSys.AppendSeparator();
 
@@ -378,10 +381,10 @@ void MainEmuFrame::CreatePcsx2Menu()
 	m_menuSys.Append(MenuId_GameSettingsSubMenu, _("&Game Settings"), &m_GameSettingsSubmenu);
 
 	m_GameSettingsSubmenu.Append(MenuId_EnablePatches, _("Automatic &Gamefixes"),
-								 _("Automatically applies needed Gamefixes to known problematic games"), wxITEM_CHECK);
+								 _("Automatically applies needed Gamefixes to known problematic games."), wxITEM_CHECK);
 
 	m_GameSettingsSubmenu.Append(MenuId_EnableCheats, _("Enable &Cheats"),
-								 wxEmptyString, wxITEM_CHECK);
+								 _("Use cheats otherwise known as pnachs from the cheats folder."), wxITEM_CHECK);
 
 	m_GameSettingsSubmenu.Append(MenuId_EnableIPC, _("Enable &IPC"),
 								 wxEmptyString, wxITEM_CHECK);
@@ -391,12 +394,12 @@ void MainEmuFrame::CreatePcsx2Menu()
 
 #ifndef DISABLE_RECORDING
 	m_GameSettingsSubmenu.Append(MenuId_EnableInputRecording, _("Enable &Input Recording"),
-								 wxEmptyString, wxITEM_CHECK);
+								 _("Input Recording for controller/keyboard presses, tools for automation and playback."), wxITEM_CHECK);
 #endif
 
-	if (IsDebugBuild || IsDevBuild)
-		m_GameSettingsSubmenu.Append(MenuId_EnableHostFs, _("Enable &Host Filesystem"),
-									 wxEmptyString, wxITEM_CHECK);
+
+	m_GameSettingsSubmenu.Append(MenuId_EnableHostFs, _("Enable &Host Filesystem"),
+								 wxEmptyString, wxITEM_CHECK);
 
 	m_menuSys.AppendSeparator();
 
@@ -408,7 +411,7 @@ void MainEmuFrame::CreatePcsx2Menu()
 	m_menuSys.AppendSeparator();
 
 	m_menuSys.Append(MenuId_Exit, _("E&xit"),
-					 AddAppName(_("Closing %s may be hazardous to your health")));
+					 AddAppName(_("Closing %s may be hazardous to your health.")));
 }
 
 void MainEmuFrame::CreateCdvdMenu()
@@ -438,13 +441,13 @@ void MainEmuFrame::CreateConfigMenu()
 	m_menuConfig.Append(MenuId_Config_McdSettings, _("&Memory Cards..."));
 	m_menuConfig.Append(MenuId_Config_BIOS, _("&Plugin/BIOS Selector..."));
 	m_menuConfig.Append(MenuId_Config_SPU2, _("&Audio Settings..."));
+	m_menuConfig.Append(MenuId_Config_DEV9,			_("&Network and HDD Settings...") );
+	m_menuConfig.Append(MenuId_Config_USB, _("&USB Settings..."));
 
 	m_menuConfig.AppendSeparator();
 
 	m_menuConfig.Append(MenuId_Config_GS, _("&Video (GS)"), m_PluginMenuPacks[PluginId_GS]);
 	m_menuConfig.Append(MenuId_Config_PAD, _("&Controllers (PAD)"), m_PluginMenuPacks[PluginId_PAD]);
-	m_menuConfig.Append(MenuId_Config_DEV9, _("&Dev9"), m_PluginMenuPacks[PluginId_DEV9]);
-	m_menuConfig.Append(MenuId_Config_USB, _("&USB"), m_PluginMenuPacks[PluginId_USB]);
 
 	m_menuConfig.AppendSeparator();
 	m_menuConfig.Append(MenuId_Config_Multitap0Toggle, _("Multitap &1"), wxEmptyString, wxITEM_CHECK);
@@ -474,7 +477,9 @@ void MainEmuFrame::CreateCaptureMenu()
 	m_submenuVideoCapture.Append(MenuId_Capture_Video_Record, _("Start Screenrecorder"));
 	m_submenuVideoCapture.Append(MenuId_Capture_Video_Stop, _("Stop Screenrecorder"))->Enable(false);
 
-	m_menuCapture.Append(MenuId_Capture_Screenshot, _("Screenshot"));
+	m_menuCapture.Append(MenuId_Capture_Screenshot, _("Screenshot"), &m_submenuScreenshot);
+	m_submenuScreenshot.Append(MenuId_Capture_Screenshot_Screenshot, _("Screenshot"));
+	m_submenuScreenshot.Append(MenuId_Capture_Screenshot_Screenshot_As, _("Screenshot As..."));
 }
 
 void MainEmuFrame::CreateRecordMenu()
@@ -501,7 +506,7 @@ void MainEmuFrame::CreateHelpMenu()
 	m_menuHelp.Append(MenuId_Help_Website, _("&Website"));
 	m_menuHelp.Append(MenuId_Help_Wiki, _("&Wiki"));
 	m_menuHelp.Append(MenuId_Help_Forums, _("&Support Forums"));
-	m_menuHelp.Append(MenuId_Help_Github, _("&Github Repository"));
+	m_menuHelp.Append(MenuId_Help_Github, _("&GitHub Repository"));
 	m_menuHelp.AppendSeparator();
 	m_menuHelp.Append(MenuId_About, _("&About..."));
 }
@@ -523,6 +528,7 @@ MainEmuFrame::MainEmuFrame(wxWindow* parent, const wxString& title)
 	, m_menuWindow(*new wxMenu())
 	, m_menuCapture(*new wxMenu())
 	, m_submenuVideoCapture(*new wxMenu())
+	, m_submenuScreenshot(*new wxMenu())
 #ifndef DISABLE_RECORDING
 	, m_menuRecording(*new wxMenu())
 #endif
@@ -729,7 +735,7 @@ void MainEmuFrame::ApplyCoreStatus()
 	wxMenuItem* cdvd_menu = menubar.FindItem(MenuId_Boot_CDVD);
 
 	wxString label;
-	wxString help_text = _("Use fast boot to skip PS2 startup and splash screens");
+	wxString help_text = _("Use fast boot to skip PS2 startup and splash screens.");
 
 	switch (Source)
 	{
@@ -839,7 +845,7 @@ void PerPluginMenuInfo::Populate(PluginsEnum_t pid)
 
 	PluginId = pid;
 
-	MyMenu.Append(GetPluginMenuId_Name(PluginId), _("No plugin loaded"))->Enable(false);
+	MyMenu.Append(GetPluginMenuId_Name(PluginId), _("No plugins loaded."))->Enable(false);
 	MyMenu.AppendSeparator();
 
 	if (PluginId == PluginId_GS)

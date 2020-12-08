@@ -13,8 +13,6 @@ on:
       - debian-packager/
       - bin/PCSX2_keys.ini.default
       - "plugins/LilyPad/**"
-      - .travis.yml # TODO - remove with travis-ci
-      - appveyor.yml # TODO - remove with appveyor
   pull_request:
     branches:
       - master
@@ -25,8 +23,6 @@ on:
       - debian-packager/
       - bin/PCSX2_keys.ini.default
       - "plugins/LilyPad/**"
-      - .travis.yml # TODO - remove with travis-ci
-      - appveyor.yml # TODO - remove with appveyor
 
 jobs:
   build:
@@ -34,11 +30,31 @@ jobs:
       # Prevent one build from failing everything (although maybe those should be included as experimental builds instead)
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
-        platform: [x86, x64]
-        experimental: [false]
+        include:
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: gcc
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x64
+            compiler: gcc
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: clang
+            # Need to disable PCH until cmake 3.17
+            # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
+            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+            detail: -nopch
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: gcc
+            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+            detail: -nopch
+            experimental: false
 
-    name: ${{ matrix.os }}-${{ matrix.platform }}
+    name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     # Set some sort of timeout in the event of run-away builds.  We are limited on concurrent jobs so, get rid of them.
@@ -62,9 +78,11 @@ jobs:
         with:
           key: submodules-${{ hashFiles('./.gitmodules') }}
           path: |
-            ./3rdparty/xz
-            ./3rdparty/gtest
             ./.git/modules/
+            ./3rdparty/fmt
+            ./3rdparty/xz
+            ./3rdparty/yaml-cpp
+            ./3rdparty/gtest
 
       - name: Checkout Submodules
         if: steps.cache-submodules.outputs.cache-hit != 'true'
@@ -82,23 +100,23 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
-            ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}-ccache-
+            ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
 
       - name: Install Packages
         env:
           PLATFORM: ${{ matrix.platform }}
-        # TODO - give the file executable permissions and commit it
-        run: |
-          chmod +x .github/workflows/scripts/build-linux.sh
-          ./.github/workflows/scripts/build-linux.sh install_packages
+          COMPILER: ${{ matrix.compiler }}
+        run: ./.github/workflows/scripts/linux/install-packages.sh
 
-      - name: Build PCSX2
+      - name: Generate CMake
         env:
           PLATFORM: ${{ matrix.platform }}
-        # TODO - give the file executable permissions and commit it
-        run: |
-          chmod +x .github/workflows/scripts/build-linux.sh
-          ./.github/workflows/scripts/build-linux.sh generate_cmake
-          ./.github/workflows/scripts/build-linux.sh compile
+          COMPILER: ${{ matrix.compiler }}
+          ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
+        run: ./.github/workflows/scripts/linux/generate-cmake.sh
+
+      - name: Build PCSX2
+        working-directory: ./build
+        run: ../.github/workflows/scripts/linux/compile.sh
