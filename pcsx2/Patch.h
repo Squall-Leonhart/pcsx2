@@ -24,7 +24,7 @@
 //   - At the "cheats_ws" folder or inside "cheats_ws.zip" (the zip also called "widescreen cheats DB")
 //     - the latter is searched if the former is not found for a CRC
 //     - UI name: "Widescreen hacks/patches", controlled via system -> enable widescreen patches
-// - At GameIndex.DBF inside a [patches] section
+// - At GameIndex.yaml inside a [patches] section
 //   - UI name: "Patches", controlled via system -> enable automatic game fixes
 //   - note that automatic game fixes also controls automatic config changes from GameIndex.dbf (UI name: "fixes")
 //
@@ -37,6 +37,7 @@
 
 #include "Pcsx2Defs.h"
 #include "SysForwardDefs.h"
+#include "AppGameDatabase.h"
 
 enum patch_cpu_type {
 	NO_CPU,
@@ -102,7 +103,7 @@ namespace PatchFunc
 // The following LoadPatchesFrom* functions:
 // - do not reset/unload previously loaded patches (use ForgetLoadedPatches() for that)
 // - do not actually patch the emulation memory (that happens at ApplyLoadedPatches(...) )
-extern int  LoadPatchesFromGamesDB(const wxString& name, const Game_Data& game);
+extern int  LoadPatchesFromGamesDB(const wxString& crc, const GameDatabaseSchema::GameEntry& game);
 extern int  LoadPatchesFromDir(wxString name, const wxDirName& folderName, const wxString& friendlyName);
 extern int  LoadPatchesFromZip(wxString gameCRC, const wxString& cheatsArchiveFilename);
 
