@@ -7391,6 +7391,14 @@ SLES-50725:
 SLES-50726:
   name: "Myst III - Exile"
   region: "PAL-M6"
+  patches:
+    9E159E95:
+      content: |-
+        // Gives the IPU more time to process the textures
+        // CPU does a wait loop then starts copying the output of the IPU
+        patch=0,EE,001f02a0,word,24027fff
+  gameFixes:
+    - EETimingHack # Speeds up IPU DMA's
 SLES-50727:
   name: "Knockout Kings 2002"
   region: "PAL-E"
@@ -7727,6 +7735,13 @@ SLES-50846:
 SLES-50848:
   name: "Speed Kings"
   region: "PAL-M5"
+  patches:
+    4C133D9D:
+      content: |-
+        author=Prafull
+        // Fixes hang before going ingame.
+        // Needed due to lack of VIF FIFO in PCSX2.
+        patch=1,EE,0022ee34,word,00000000
 SLES-50849:
   name: "Urban Freestyle Soccer"
   region: "PAL-M5"
@@ -8988,13 +9003,6 @@ SLES-51495:
   name: "SX Superstar"
   region: "PAL-M4"
   compat: 5
-  patches:
-    96B76E56:
-      content: |-
-        comment=Patches by Nachbrenner
-        // Fix IPU busy!
-        patch=0,EE,003300b0,word,03e00008
-        patch=0,EE,003300b4,word,00000000
 SLES-51496:
   name: "Breath of Fire: Dragon Quarter"
   region: "PAL-M5"
@@ -20254,6 +20262,8 @@ SLPM-65014:
   name: "Bouken Jidai Katsugeki - Goemon"
   region: "NTSC-J"
   compat: 5
+  gameFixes:
+    - GoemonTlbHack
 SLPM-65015:
   name: "Kessen 2"
   region: "NTSC-J"
@@ -22572,6 +22582,15 @@ SLPM-65797:
   name: "Dragon Quest & Final Fantasy in Itadaki Street"
   region: "NTSC-J"
   compat: 5
+  patches:
+    4CE7FB04:
+      content: |-
+        author=refraction
+        // Game seems to have problems with alpha values being zero in some instances
+        // this patches the results from FPU to be an alpha of 2
+        // Fixes missing board
+        patch=1,EE,00143CBC,word,3C030200
+        patch=1,EE,00143CC0,word,00831825
 SLPM-65798:
   name: "Madden NFL Superbowl 2005"
   region: "NTSC-J"
@@ -32715,6 +32734,14 @@ SLUS-20434:
   name: "Myst III - Exile"
   region: "NTSC-U"
   compat: 5
+  patches:
+    75DB04A3:
+      content: |-
+        // Gives the IPU more time to process the textures
+        // CPU does a wait loop then starts copying the output of the IPU
+        patch=0,EE,001f0030,word,24027fff
+  gameFixes:
+    - EETimingHack # Speeds up IPU DMA's
 SLUS-20435:
   name: "Armored Core 3"
   region: "NTSC-U"
@@ -33329,6 +33356,13 @@ SLUS-20584:
   name: "Speed Kings"
   region: "NTSC-U"
   compat: 3
+  patches:
+    C90920FC:
+      content: |-
+        author=Prafull
+        // Fixes hang before going ingame.
+        // Needed due to lack of VIF FIFO in PCSX2.
+        patch=1,EE,0022b4a4,word,00000000
 SLUS-20585:
   name: "Powerpuff Girls, The - Relish Rampage"
   region: "NTSC-U"

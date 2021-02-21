@@ -136,6 +136,10 @@ public:
 struct V_Voice
 {
 	u32 PlayCycle; // SPU2 cycle where the Playing started
+	u32 LoopCycle; // SPU2 cycle where it last set its own Loop
+
+	u32 PendingLoopStartA;
+	bool PendingLoopStart;
 
 	V_VolumeSlideLR Volume;
 
@@ -189,7 +193,7 @@ struct V_Voice
 	s32 SCurrent;
 
 	// it takes a few ticks for voices to start on the real SPU2?
-	bool Start();
+	void Start();
 	void Stop();
 };
 
@@ -594,6 +598,8 @@ struct PcmCacheEntry
 {
 	bool Validated;
 	s16 Sampledata[pcm_DecodedSamplesPerBlock];
+	s32 Prev1;
+	s32 Prev2;
 };
 
 extern PcmCacheEntry* pcm_cache_data;

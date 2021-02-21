@@ -110,8 +110,18 @@ StereoOut32 V_Core::ReadInput()
 	if (InputDataTransferred)
 	{
 		u32 amount = std::min(InputDataTransferred, (u32)0x180);
-		MADR += amount;
+
 		InputDataTransferred -= amount;
+		MADR += amount;
+		// Because some games watch the MADR to see when it reaches the end we need to end the DMA here
+		// Tom & Jerry War of the Whiskers is one such game, the music will skip
+		if (!InputDataTransferred && !InputDataLeft)
+		{
+			if (Index == 0)
+				spu2DMA4Irq();
+			else
+				spu2DMA7Irq();
+		}
 	}
 
 	if (PlayMode == 2 && Index == 0) //Bitstream bypass refills twice as quickly (GTA VC)
@@ -141,8 +151,6 @@ StereoOut32 V_Core::ReadInput()
 				}
 
 				InputDataLeft = 0;
-				DMAICounter = InputDataTransferred * 4;
-				LastClock = *cyclePtr;
 			}
 		}
 		else if ((AutoDMACtrl & (Index + 1)))
