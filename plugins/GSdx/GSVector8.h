@@ -23,6 +23,42 @@
 
 class alignas(32) GSVector8
 {
+	constexpr static __m256 cxpr_setr_ps(float x0, float y0, float z0, float w0, float x1, float y1, float z1, float w1)
+	{
+#ifdef __GNUC__
+		return __m256{x0, y0, z0, w0, x1, y1, z1, w1};
+#else
+		__m256 m = {};
+		m.m256_f32[0] = x0;
+		m.m256_f32[1] = y0;
+		m.m256_f32[2] = z0;
+		m.m256_f32[3] = w0;
+		m.m256_f32[4] = x1;
+		m.m256_f32[5] = y1;
+		m.m256_f32[6] = z1;
+		m.m256_f32[7] = w1;
+		return m;
+#endif
+	}
+
+	constexpr static __m256 cxpr_setr_epi32(int x0, int y0, int z0, int w0, int x1, int y1, int z1, int w1)
+	{
+#ifdef __GNUC__
+		return (__m256)__v8si{x0, y0, z0, w0, x1, y1, z1, w1};
+#else
+		union { __m256 m; int i[8]; } t = {};
+		t.i[0] = x0;
+		t.i[1] = y0;
+		t.i[2] = z0;
+		t.i[3] = w0;
+		t.i[4] = x1;
+		t.i[5] = y1;
+		t.i[6] = z1;
+		t.i[7] = w1;
+		return t.m;
+#endif
+	}
+
 public:
 	union
 	{
@@ -42,19 +78,40 @@ public:
 		__m128 m0, m1;
 	};
 
-	static GSVector8 m_half;
-	static GSVector8 m_one;
-	static GSVector8 m_x7fffffff;
-	static GSVector8 m_x80000000;
-	static GSVector8 m_x4b000000;
-	static GSVector8 m_x4f800000;
-	static GSVector8 m_max;
-	static GSVector8 m_min;
+	static const GSVector8 m_half;
+	static const GSVector8 m_one;
+	static const GSVector8 m_x7fffffff;
+	static const GSVector8 m_x80000000;
+	static const GSVector8 m_x4b000000;
+	static const GSVector8 m_x4f800000;
+	static const GSVector8 m_max;
+	static const GSVector8 m_min;
 
-	static void InitVectors();
+	GSVector8() = default;
 
-	__forceinline GSVector8() 
+	static constexpr GSVector8 cxpr(float x0, float y0, float z0, float w0, float x1, float y1, float z1, float w1)
 	{
+		return GSVector8(cxpr_setr_ps(x0, y0, z0, w0, x1, y1, z1, w1));
+	}
+
+	static constexpr GSVector8 cxpr(float x)
+	{
+		return GSVector8(cxpr_setr_ps(x, x, x, x, x, x, x, x));
+	}
+
+	static constexpr GSVector8 cxpr(int x0, int y0, int z0, int w0, int x1, int y1, int z1, int w1)
+	{
+		return GSVector8(cxpr_setr_epi32(x0, y0, z0, w0, x1, y1, z1, w1));
+	}
+
+	static constexpr GSVector8 cxpr(int x)
+	{
+		return GSVector8(cxpr_setr_epi32(x, x, x, x, x, x, x, x));
+	}
+
+	static constexpr GSVector8 cxpr(uint32 x)
+	{
+		return cxpr(static_cast<int>(x));
 	}
 
 	__forceinline GSVector8(float x0, float y0, float z0, float w0, float x1, float y1, float z1, float w1)
@@ -80,10 +137,7 @@ public:
 		#endif
 	}
 
-	__forceinline GSVector8(const GSVector8& v)
-	{
-		m = v.m;
-	}
+	constexpr GSVector8(const GSVector8& v) = default;
 
 	__forceinline explicit GSVector8(float f)
 	{
@@ -110,9 +164,9 @@ public:
 		*this = m;
 	}
 
-	__forceinline explicit GSVector8(__m256 m)
+	__forceinline constexpr explicit GSVector8(__m256 m)
+		: m(m)
 	{
-		this->m = m;
 	}
 
 	#if _M_SSE >= 0x501

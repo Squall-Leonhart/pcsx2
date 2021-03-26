@@ -21,6 +21,34 @@
 
 class alignas(16) GSVector4
 {
+	constexpr static __m128 cxpr_setr_ps(float x, float y, float z, float w)
+	{
+#ifdef __GNUC__
+		return __m128{x, y, z, w};
+#else
+		__m128 m = {};
+		m.m128_f32[0] = x;
+		m.m128_f32[1] = y;
+		m.m128_f32[2] = z;
+		m.m128_f32[3] = w;
+		return m;
+#endif
+	}
+
+	constexpr static __m128 cxpr_setr_epi32(int x, int y, int z, int w)
+	{
+#ifdef __GNUC__
+		return (__m128)(__v4si{x, y, z, w});
+#else
+		__m128 m = {};
+		m.m128_i32[0] = x;
+		m.m128_i32[1] = y;
+		m.m128_i32[2] = z;
+		m.m128_i32[3] = w;
+		return m;
+#endif
+	}
+
 public:
 	union
 	{
@@ -40,24 +68,40 @@ public:
 		__m128 m;
 	};
 
-	static GSVector4 m_ps0123;
-	static GSVector4 m_ps4567;
-	static GSVector4 m_half;
-	static GSVector4 m_one;
-	static GSVector4 m_two;
-	static GSVector4 m_four;
-	static GSVector4 m_x4b000000;
-	static GSVector4 m_x4f800000;
-	static GSVector4 m_max;
-	static GSVector4 m_min;
+	static const GSVector4 m_ps0123;
+	static const GSVector4 m_ps4567;
+	static const GSVector4 m_half;
+	static const GSVector4 m_one;
+	static const GSVector4 m_two;
+	static const GSVector4 m_four;
+	static const GSVector4 m_x4b000000;
+	static const GSVector4 m_x4f800000;
+	static const GSVector4 m_max;
+	static const GSVector4 m_min;
 
-	static void InitVectors();
-
-	__forceinline GSVector4()
-	{
-	}
+	GSVector4() = default;
 
 	constexpr GSVector4(const GSVector4&) = default;
+
+	constexpr static GSVector4 cxpr(float x, float y, float z, float w)
+	{
+		return GSVector4(cxpr_setr_ps(x, y, z, w));
+	}
+
+	constexpr static GSVector4 cxpr(float x)
+	{
+		return GSVector4(cxpr_setr_ps(x, x, x, x));
+	}
+
+	constexpr static GSVector4 cxpr(int x, int y, int z, int w)
+	{
+		return GSVector4(cxpr_setr_epi32(x, y, z, w));
+	}
+
+	constexpr static GSVector4 cxpr(int x)
+	{
+		return GSVector4(cxpr_setr_epi32(x, x, x, x));
+	}
 
 	__forceinline GSVector4(float x, float y, float z, float w)
 	{
@@ -81,12 +125,6 @@ public:
 		m = _mm_cvtepi32_ps(_mm_unpacklo_epi32(_mm_cvtsi32_si128(x), _mm_cvtsi32_si128(y)));
 	}
 
-	//Not currently used, just causes a compiler warning
-	/*__forceinline GSVector4(const GSVector4& v)
-	{
-		m = v.m;
-	}*/
-
 	__forceinline explicit GSVector4(const GSVector2& v)
 	{
 		m = _mm_castsi128_ps(_mm_loadl_epi64((__m128i*)&v));
@@ -97,9 +135,9 @@ public:
 		m = _mm_cvtepi32_ps(_mm_loadl_epi64((__m128i*)&v));
 	}
 
-	__forceinline explicit GSVector4(__m128 m)
+	__forceinline constexpr explicit GSVector4(__m128 m)
+		: m(m)
 	{
-		this->m = m;
 	}
 
 	__forceinline explicit GSVector4(float f)
