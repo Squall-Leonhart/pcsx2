@@ -57,7 +57,7 @@ wxString BiosDescription;
 const BiosDebugInformation* CurrentBiosInformation;
 
 const BiosDebugInformation biosVersions[] = {
-	// Note: The SCPH versions have not been verified
+	// Notes: The SCPH versions have not been verified
 	
 	// USA     v02.00(14/06/2004) SCPH70012
 	{ 0x00000200, 0xD778DB8D, 0x8001A640 },
@@ -67,6 +67,8 @@ const BiosDebugInformation biosVersions[] = {
 	{ 0x0000013C, 0x3A75B059, 0x8001A480 },
 	// Europe  v02.20(10/02/2006) SCPH77008
 	{ 0x00000214, 0xD7EDD771, 0x8001AC00 },
+	// Europe  v02.20(20/06/2005) SCPH75004
+	{ 0x00000214, 0x0E9C22D3, 0x8001AC00 },
 	// Europe  v02.00(16/06/2004) SCPH70008
 	{ 0x00000200, 0x3C6AA4F4, 0x8001A640 },
 	// Europe  v02.00(14/06/2004) SCPH70004
@@ -78,10 +80,12 @@ const BiosDebugInformation biosVersions[] = {
 	{ 0x0000015A, 0xE36776DC, 0x8001A640 },
 	// Europe  v01.70(27/02/2003) SCPH50004
 	{ 0x00000146 ,0x4954F4A2, 0x8001A640 },
-	// Europe  v01.60(04/10/2001) SCPH30004
-	{ 0x0000013C, 0xB8E26E89, 0x8001A580 },
 	// Europe  v01.60(19/03/2002) SCPH39004
 	{ 0x0000013C, 0xFA3F9E90, 0x8001A280 },
+	// Europe  v01.60(04/10/2001) SCPH30004
+	{ 0x0000013C, 0xB8E26E89, 0x8001A580 },
+	// Europe  v01.60(04/10/2001) SCPH30004R
+	{ 0x0000013C, 0xEC9058f6, 0x8001A580 },
 	// Europe  v01.20(02/09/2000) SCPH30003
 	{ 0x00000114, 0xCF83F17A, 0x80017B40 },
 	// Japan   v02.20(05/09/2006) SCPH90006
