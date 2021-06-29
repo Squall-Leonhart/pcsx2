@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2010  PCSX2 Dev Team
+ *  Copyright (C) 2002-2021  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -22,6 +22,7 @@
 #include "Dialogs/ModalPopups.h"
 #include "IsoDropTarget.h"
 
+#include "fmt/core.h"
 #include <wx/iconbndl.h>
 
 #include <unordered_map>
@@ -29,12 +30,12 @@
 
 #include "svnrev.h"
 #include "Saveslots.h"
+
 #ifndef DISABLE_RECORDING
 #include "Recording/InputRecording.h"
+#include "Recording/InputRecordingControls.h"
 #endif
 
-
-#include "fmt/core.h"
 // ------------------------------------------------------------------------
 wxMenu* MainEmuFrame::MakeStatesSubMenu(int baseid, int loadBackupId) const
 {
@@ -317,6 +318,7 @@ void MainEmuFrame::ConnectMenus()
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_New_Click, this, MenuId_Recording_New);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_Play_Click, this, MenuId_Recording_Play);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_Stop_Click, this, MenuId_Recording_Stop);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_Config_FrameAdvance, this, MenuId_Recording_Config_FrameAdvance);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_TogglePause_Click, this, MenuId_Recording_TogglePause);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_FrameAdvance_Click, this, MenuId_Recording_FrameAdvance);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_ToggleRecordingMode_Click, this, MenuId_Recording_ToggleRecordingMode);
@@ -427,9 +429,9 @@ void MainEmuFrame::CreatePcsx2Menu()
 		_("Input Recording for controller/keyboard presses, tools for automation and playback."), wxITEM_CHECK);
 #endif
 
-
 	m_GameSettingsSubmenu.Append(MenuId_EnableHostFs, _("Enable &Host Filesystem"),
 		wxEmptyString, wxITEM_CHECK);
+
 	m_menuSys.AppendSeparator();
 	// Implement custom hotkeys (F3) with translatable string intact + not blank in GUI.
 	wxMenuItem* sysLoadStateItem = m_menuSys.Append(MenuId_Sys_LoadStates, _("&Load state"), &m_LoadStatesSubmenu);
@@ -533,17 +535,25 @@ void MainEmuFrame::CreateCaptureMenu()
 	m_submenuScreenshot.Append(MenuId_Capture_Screenshot_Screenshot_As, _("Screenshot As..."));
 }
 
-void MainEmuFrame::CreateRecordMenu()
+void MainEmuFrame::CreateInputRecordingMenu()
 {
 #ifndef DISABLE_RECORDING
 	m_menuRecording.Append(MenuId_Recording_New, _("New"), _("Create a new input recording."))->Enable(false);
 	m_menuRecording.Append(MenuId_Recording_Stop, _("Stop"), _("Stop the active input recording."))->Enable(false);
 	m_menuRecording.Append(MenuId_Recording_Play, _("Play"), _("Playback an existing input recording."))->Enable(false);
 	m_menuRecording.AppendSeparator();
+
+	m_menuRecording.Append(MenuId_Recording_Settings, _("Settings"), &m_submenu_recording_settings);
+	wxString frame_advance_label = wxString(_("Configure Frame Advance"));
+	frame_advance_label.Append(fmt::format(" ({})", g_Conf->inputRecording.m_frame_advance_amount));
+	m_submenu_recording_settings.Append(MenuId_Recording_Config_FrameAdvance, frame_advance_label, _("Change the amount of frames advanced each time"));
+	m_menuRecording.AppendSeparator();
+
 	m_menuRecording.Append(MenuId_Recording_TogglePause, _("Toggle Pause"), _("Pause or resume emulation on the fly."))->Enable(false);
 	m_menuRecording.Append(MenuId_Recording_FrameAdvance, _("Frame Advance"), _("Advance emulation forward by a single frame at a time."))->Enable(false);
 	m_menuRecording.Append(MenuId_Recording_ToggleRecordingMode, _("Toggle Recording Mode"), _("Save/playback inputs to/from the recording file."))->Enable(false);
 	m_menuRecording.AppendSeparator();
+
 	m_menuRecording.Append(MenuId_Recording_VirtualPad_Port0, _("Virtual Pad (Port 1)"));
 	m_menuRecording.Append(MenuId_Recording_VirtualPad_Port1, _("Virtual Pad (Port 2)"));
 #endif
@@ -583,15 +593,16 @@ MainEmuFrame::MainEmuFrame(wxWindow* parent, const wxString& title)
 	, m_submenuScreenshot(*new wxMenu())
 #ifndef DISABLE_RECORDING
 	, m_menuRecording(*new wxMenu())
+	, m_submenu_recording_settings(*new wxMenu())
 #endif
 	, m_menuHelp(*new wxMenu())
 	, m_LoadStatesSubmenu(*MakeStatesSubMenu(MenuId_State_Load01, MenuId_State_LoadBackup))
 	, m_SaveStatesSubmenu(*MakeStatesSubMenu(MenuId_State_Save01))
 	, m_GameSettingsSubmenu(*new wxMenu())
 
-	, m_MenuItem_Console(*new wxMenuItem(&m_menuWindow, MenuId_Console, _("&Show Console"), wxEmptyString, wxITEM_CHECK))
+	, m_MenuItem_Console(*new wxMenuItem(&m_menuWindow, MenuId_Console, _("&Show Program Log"), wxEmptyString, wxITEM_CHECK))
 #if defined(__unix__)
-	, m_MenuItem_Console_Stdio(*new wxMenuItem(&m_menuWindow, MenuId_Console_Stdio, _("&Console to Stdio"), wxEmptyString, wxITEM_CHECK))
+	, m_MenuItem_Console_Stdio(*new wxMenuItem(&m_menuWindow, MenuId_Console_Stdio, _("&Program Log to Stdio"), wxEmptyString, wxITEM_CHECK))
 #endif
 
 {
@@ -605,7 +616,7 @@ MainEmuFrame::MainEmuFrame(wxWindow* parent, const wxString& title)
 	// Initial menubar setup.  This needs to be done first so that the menu bar's visible size
 	// can be factored into the window size (which ends up being background+status+menus)
 
-	m_menubar.Append(&m_menuSys, _("&PCSX2"));
+	m_menubar.Append(&m_menuSys, _("&System"));
 	m_menubar.Append(&m_menuCDVD, _("CD&VD"));
 	m_menubar.Append(&m_menuConfig, _("&Config"));
 	m_menubar.Append(&m_menuWindow, _("&Debug"));
@@ -686,7 +697,7 @@ MainEmuFrame::MainEmuFrame(wxWindow* parent, const wxString& title)
 	CreateWindowsMenu();
 	CreateCaptureMenu();
 #ifndef DISABLE_RECORDING
-	CreateRecordMenu();
+	CreateInputRecordingMenu();
 #endif
 	CreateHelpMenu();
 
@@ -842,6 +853,10 @@ void MainEmuFrame::ApplyConfigToGui(AppConfig& configToApply, int flags)
 		menubar.Check(MenuId_Capture_Video_IncludeAudio, configToApply.AudioCapture.EnableAudio);
 #ifndef DISABLE_RECORDING
 		menubar.Check(MenuId_EnableInputRecording, configToApply.EmuOptions.EnableRecordingTools);
+		wxString frame_advance_label = wxString(_("Configure Frame Advance"));
+		frame_advance_label.Append(fmt::format(" ({})", configToApply.inputRecording.m_frame_advance_amount));
+		m_submenu_recording_settings.SetLabel(MenuId_Recording_Config_FrameAdvance, frame_advance_label);
+		g_InputRecordingControls.setFrameAdvanceAmount(configToApply.inputRecording.m_frame_advance_amount);
 #endif
 		menubar.Check(MenuId_EnableHostFs, configToApply.EmuOptions.HostFs);
 		menubar.Check(MenuId_Debug_CreateBlockdump, configToApply.EmuOptions.CdvdDumpBlocks);
