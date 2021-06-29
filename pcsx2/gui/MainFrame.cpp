@@ -36,6 +36,8 @@
 #include "Recording/InputRecordingControls.h"
 #endif
 
+extern std::atomic_bool init_gspanel;
+
 // ------------------------------------------------------------------------
 wxMenu* MainEmuFrame::MakeStatesSubMenu(int baseid, int loadBackupId) const
 {
@@ -154,6 +156,10 @@ bool MainEmuFrame::Destroy()
 //
 void MainEmuFrame::OnCloseWindow(wxCloseEvent& evt)
 {
+	// the main thread is busy suspending everything, so let's not try to call it 
+	// when closing the emulator
+	init_gspanel = false;
+
 	if (IsBeingDeleted())
 		return;
 
@@ -272,16 +278,15 @@ void MainEmuFrame::ConnectMenus()
 	// Config
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_SysSettings_Click, this, MenuId_Config_SysSettings);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_McdSettings_Click, this, MenuId_Config_McdSettings);
-	Bind(wxEVT_MENU, &MainEmuFrame::Menu_SelectPluginsBios_Click, this, MenuId_Config_BIOS);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_SelectBios_Click, this, MenuId_Config_BIOS);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_AudioSettings_Click, this, MenuId_Config_SPU2);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_NetworkSettings_Click, this, MenuId_Config_DEV9);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_USBSettings_Click, this, MenuId_Config_USB);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_PADSettings_Click, this, MenuId_Config_PAD);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_GSSettings_Click, this, MenuId_Config_GS);
 
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_GSSettings_Click, this, MenuId_Video_CoreSettings);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_WindowSettings_Click, this, MenuId_Video_WindowSettings);
-	for (int i = 0; i < PluginId_Count; ++i)
-		Bind(wxEVT_MENU, &MainEmuFrame::Menu_ConfigPlugin_Click, this, MenuId_PluginBase_Settings + i * PluginMenuId_Interval);
 
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_MultitapToggle_Click, this, MenuId_Config_Multitap0Toggle);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_MultitapToggle_Click, this, MenuId_Config_Multitap1Toggle);
@@ -344,25 +349,6 @@ void MainEmuFrame::InitLogBoxPosition(AppConfig::ConsoleLogOptions& conf)
 	}
 }
 
-void MainEmuFrame::DispatchEvent(const PluginEventType& plugin_evt)
-{
-	if (!pxAssertMsg(GetMenuBar() != NULL, "Mainframe menu bar is NULL!"))
-		return;
-
-	//ApplyCoreStatus();
-
-	if (plugin_evt == CorePlugins_Unloaded)
-	{
-		for (int i = 0; i < PluginId_Count; ++i)
-			m_PluginMenuPacks[i].OnUnloaded();
-	}
-	else if (plugin_evt == CorePlugins_Loaded)
-	{
-		for (int i = 0; i < PluginId_Count; ++i)
-			m_PluginMenuPacks[i].OnLoaded();
-	}
-}
-
 void MainEmuFrame::DispatchEvent(const CoreThreadStatus& status)
 {
 	if (!pxAssertMsg(GetMenuBar() != NULL, "Mainframe menu bar is NULL!"))
@@ -375,16 +361,6 @@ void MainEmuFrame::AppStatusEvent_OnSettingsApplied()
 	ApplySettings();
 }
 
-int GetPluginMenuId_Settings(PluginsEnum_t pid)
-{
-	return MenuId_PluginBase_Settings + ((int)pid * PluginMenuId_Interval);
-}
-
-static int GetPluginMenuId_Name(PluginsEnum_t pid)
-{
-	return MenuId_PluginBase_Name + ((int)pid * PluginMenuId_Interval);
-}
-
 void MainEmuFrame::CreatePcsx2Menu()
 {
 	// ------------------------------------------------------------------------
@@ -395,7 +371,7 @@ void MainEmuFrame::CreatePcsx2Menu()
 	m_menuSys.Append(MenuId_Sys_SuspendResume, _("Initializing..."));
 
 	m_menuSys.Append(MenuId_Sys_Shutdown, _("Shut&down"),
-		_("Wipes all internal VM states and shuts down plugins."));
+		_("Wipes all internal VM states."));
 	m_menuSys.FindItem(MenuId_Sys_Shutdown)->Enable(false);
 
 	m_menuSys.Append(MenuId_Boot_ELF, _("&Run ELF..."),
@@ -473,16 +449,14 @@ void MainEmuFrame::CreateConfigMenu()
 {
 	m_menuConfig.Append(MenuId_Config_SysSettings, _("Emulation &Settings..."));
 	m_menuConfig.Append(MenuId_Config_McdSettings, _("&Memory Cards..."));
-	m_menuConfig.Append(MenuId_Config_BIOS, _("&Plugin/BIOS Selector..."));
+	m_menuConfig.Append(MenuId_Config_BIOS, _("&BIOS Selector..."));
 	m_menuConfig.Append(MenuId_Config_SPU2, _("&Audio Settings..."));
 	m_menuConfig.Append(MenuId_Config_DEV9, _("&Network and HDD Settings..."));
 	m_menuConfig.Append(MenuId_Config_USB, _("&USB Settings..."));
 	m_menuConfig.Append(MenuId_Config_PAD, _("&GamePad Settings..."));
+	m_menuConfig.Append(MenuId_Config_GS, _("&Graphical Settings..."));
 	m_menuConfig.AppendSeparator();
 
-	m_menuConfig.Append(MenuId_Config_GS, _("&Video (GS)"), m_PluginMenuPacks[PluginId_GS]);
-
-	m_menuConfig.AppendSeparator();
 	m_menuConfig.Append(MenuId_Config_Multitap0Toggle, _("Multitap &1"), wxEmptyString, wxITEM_CHECK);
 	m_menuConfig.Append(MenuId_Config_Multitap1Toggle, _("Multitap &2"), wxEmptyString, wxITEM_CHECK);
 
@@ -525,7 +499,7 @@ void MainEmuFrame::CreateCaptureMenu()
 	// Fixme: When you uncomment L1029-L1031 on that file; Linux says that Ctrl is already used for something else and will append (Shift + F8) while Windows will (Ctrl + Shift + F8)
 	m_menuCapture.Append(MenuId_Capture_Screenshot, _("Screenshot"), &m_submenuScreenshot);
 	wxMenuItem* sysScreenShotItem = m_submenuScreenshot.Append(MenuId_Capture_Screenshot_Screenshot, _("Take Screenshot"));
-	// HACK: in AcceleratorDictionary::Map the Sys_TakeSnapshot entry gets Shift and Cmd (Ctrl) hardcoded to it because it is similarly hardcoded in GSdx
+	// HACK: in AcceleratorDictionary::Map the Sys_TakeSnapshot entry gets Shift and Cmd (Ctrl) hardcoded to it because it is similarly hardcoded in GS
 	// So... remove such modifiers as the GUI menu entry is only for the base keybinding without modifiers.
 	// We can be confident in doing so, as if a user adds these modifiers themselves, the same function rejects it.
 	KeyAcceleratorCode keyCode = wxGetApp().GlobalAccels->findKeycodeWithCommandId("Sys_TakeSnapshot");
@@ -608,9 +582,6 @@ MainEmuFrame::MainEmuFrame(wxWindow* parent, const wxString& title)
 {
 	m_RestartEmuOnDelete = false;
 	m_capturingVideo = false;
-
-	for (int i = 0; i < PluginId_Count; ++i)
-		m_PluginMenuPacks[i].Populate((PluginsEnum_t)i);
 
 	// ------------------------------------------------------------------------
 	// Initial menubar setup.  This needs to be done first so that the menu bar's visible size
@@ -903,61 +874,3 @@ void MainEmuFrame::enableRecordingMenuItem(MenuIdentifiers menuId, bool enable)
 	item.Enable(enable);
 }
 #endif
-
-// ------------------------------------------------------------------------
-//   "Extensible" Plugin Menus
-// ------------------------------------------------------------------------
-
-void PerPluginMenuInfo::Populate(PluginsEnum_t pid)
-{
-	if (!pxAssert(pid < PluginId_Count))
-		return;
-
-	PluginId = pid;
-
-	MyMenu.Append(GetPluginMenuId_Name(PluginId), _("No plugins loaded."))->Enable(false);
-	MyMenu.AppendSeparator();
-
-	if (PluginId == PluginId_GS)
-	{
-		MyMenu.Append(MenuId_Video_CoreSettings, _("&Core GS Settings..."),
-			_("Modify hardware emulation settings regulated by the PCSX2 core virtual machine."));
-
-		MyMenu.Append(MenuId_Video_WindowSettings, _("&Window Settings..."),
-			_("Modify window and appearance options, including aspect ratio."));
-
-		MyMenu.AppendSeparator();
-	}
-
-	// Populate options from the plugin here.
-
-	MyMenu.Append(GetPluginMenuId_Settings(PluginId), _("&Plugin Settings..."),
-		wxsFormat(_("Opens the %s plugin's advanced settings dialog."), tbl_PluginInfo[pid].GetShortname().c_str()));
-}
-
-// deletes menu items belonging to (created by) the plugin.  Leaves menu items created
-// by the PCSX2 core intact.
-void PerPluginMenuInfo::OnUnloaded()
-{
-	// Delete any menu options added by plugins (typically a plugin will have already
-	// done its own proper cleanup when the plugin was shutdown or unloaded, but lets
-	// not trust them, shall we?)
-
-	MenuItemAddonList& curlist(m_PluginMenuItems);
-	for (uint mx = 0; mx < curlist.size(); ++mx)
-		MyMenu.Delete(curlist[mx].Item);
-
-	curlist.clear();
-
-	MyMenu.SetLabel(GetPluginMenuId_Name(PluginId), _("No plugin loaded"));
-	MyMenu.Enable(GetPluginMenuId_Settings(PluginId), false);
-}
-
-void PerPluginMenuInfo::OnLoaded()
-{
-	if (!CorePlugins.IsLoaded(PluginId))
-		return;
-	MyMenu.SetLabel(GetPluginMenuId_Name(PluginId),
-		CorePlugins.GetName(PluginId) + L" " + CorePlugins.GetVersion(PluginId));
-	MyMenu.Enable(GetPluginMenuId_Settings(PluginId), true);
-}
