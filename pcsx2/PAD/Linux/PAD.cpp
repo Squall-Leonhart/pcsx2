@@ -159,15 +159,15 @@ s32 PADfreeze(int mode, freezeData* data)
 
 	if (mode == FREEZE_SIZE)
 	{
-		data->size = sizeof(PadPluginFreezeData);
+		data->size = sizeof(PadFullFreezeData);
 	}
 	else if (mode == FREEZE_LOAD)
 	{
-		PadPluginFreezeData* pdata = (PadPluginFreezeData*)(data->data);
+		PadFullFreezeData* pdata = (PadFullFreezeData*)(data->data);
 
 		Pad::stop_vibrate_all();
 
-		if (data->size != sizeof(PadPluginFreezeData) || pdata->version != PAD_SAVE_STATE_VERSION ||
+		if (data->size != sizeof(PadFullFreezeData) || pdata->version != PAD_SAVE_STATE_VERSION ||
 			strncmp(pdata->format, "LinPad", sizeof(pdata->format)))
 			return 0;
 
@@ -199,10 +199,10 @@ s32 PADfreeze(int mode, freezeData* data)
 	}
 	else if (mode == FREEZE_SAVE)
 	{
-		if (data->size != sizeof(PadPluginFreezeData))
+		if (data->size != sizeof(PadFullFreezeData))
 			return 0;
 
-		PadPluginFreezeData* pdata = (PadPluginFreezeData*)(data->data);
+		PadFullFreezeData* pdata = (PadFullFreezeData*)(data->data);
 
 		// Tales of the Abyss - pad fix
 		// - PCSX2 only saves port0 (save #1), then port1 (save #2)
@@ -290,49 +290,3 @@ void PADWriteEvent(keyEvent& evt)
 	g_ev_fifo.push(evt);
 }
 #endif
-
-void PADDoFreezeOut(void* dest)
-{
-	freezeData fP = {0, (s8*)dest};
-	if (PADfreeze(FREEZE_SIZE, &fP) != 0)
-		return;
-	if (!fP.size)
-		return;
-
-	Console.Indent().WriteLn("Saving PAD");
-
-	if (PADfreeze(FREEZE_SAVE, &fP) != 0)
-		throw std::runtime_error(" * PAD: Error saving state!\n");
-}
-
-
-void PADDoFreezeIn(pxInputStream& infp)
-{
-	freezeData fP = {0, nullptr};
-	if (PADfreeze(FREEZE_SIZE, &fP) != 0)
-		fP.size = 0;
-
-	Console.Indent().WriteLn("Loading PAD");
-
-	if (!infp.IsOk() || !infp.Length())
-	{
-		// no state data to read, but PAD expects some state data?
-		// Issue a warning to console...
-		if (fP.size != 0)
-			Console.Indent().Warning("Warning: No data for PAD found. Status may be unpredictable.");
-
-		return;
-
-		// Note: Size mismatch check could also be done here on loading, but
-		// some plugins may have built-in version support for non-native formats or
-		// older versions of a different size... or could give different sizes depending
-		// on the status of the plugin when loading, so let's ignore it.
-	}
-
-	ScopedAlloc<s8> data(fP.size);
-	fP.data = data.GetPtr();
-
-	infp.Read(fP.data, fP.size);
-	if (PADfreeze(FREEZE_LOAD, &fP) != 0)
-		throw std::runtime_error(" * PAD: Error loading state!\n");
-}

@@ -23,19 +23,6 @@
 
 class IniInterface;
 
-enum PluginsEnum_t
-{
-	PluginId_GS = 0,
-	PluginId_Count,
-
-	// Memorycard plugin support is preliminary, and is only hacked/hardcoded in at this
-	// time.  So it's placed afer PluginId_Count so that it doesn't show up in the conf
-	// screens or other plugin tables.
-
-	PluginId_Mcd,
-	PluginId_AllocCount // Extra value for correct array allocation
-};
-
 enum GamefixId
 {
 	GamefixId_FIRST = 0,
@@ -190,8 +177,6 @@ struct TraceLogFilters
 //  Pcsx2Config class
 // --------------------------------------------------------------------------------------
 // This is intended to be a public class library between the core emulator and GUI only.
-// It is *not* meant to be shared data between core emulation and plugins, due to issues
-// with version incompatibilities if the structure formats are changed.
 //
 // When GUI code performs modifications of this class, it must be done with strict thread
 // safety, since the emu runs on a separate thread.  Additionally many components of the
