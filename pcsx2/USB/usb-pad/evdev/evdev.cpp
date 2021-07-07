@@ -17,7 +17,7 @@
 #include <cassert>
 #include <sstream>
 #include <linux/hidraw.h>
-#include "USB/linux/util.h"
+#include "../../linux/util.h"
 
 namespace usb_pad
 {

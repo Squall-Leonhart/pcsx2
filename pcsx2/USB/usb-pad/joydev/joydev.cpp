@@ -14,7 +14,7 @@
  */
 
 #include "joydev.h"
-#include "USB/linux/util.h"
+#include "../../linux/util.h"
 #include "Utilities/Console.h"
 #include <cassert>
 #include <sstream>

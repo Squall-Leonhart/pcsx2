@@ -11,7 +11,7 @@
  * the COPYING file in the top-level directory.
  */
 
-#include "USB/platcompat.h"
+#include "../platcompat.h"
 
 #ifndef IOV_H
 #define IOV_H

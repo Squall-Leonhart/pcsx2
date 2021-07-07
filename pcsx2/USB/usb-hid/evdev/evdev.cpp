@@ -16,8 +16,8 @@
 #include "evdev.h"
 #include <cassert>
 #include <sstream>
-#include "USB/usb-hid/hidproxy.h"
-#include "USB/qemu-usb/input-keymap-linux-to-qcode.h"
+#include "../hidproxy.h"
+#include "../../qemu-usb/input-keymap-linux-to-qcode.h"
 
 #ifdef USING_X11
 #include <X11/Xlib.h>

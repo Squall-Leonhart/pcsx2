@@ -40,7 +40,6 @@ svnrev.h
 /build_dev
 /build_dbg
 /obj-*
-*.obj
 
 .DS_Store
 Thumbs.db
@@ -48,8 +47,8 @@ Thumbs.db
 Debug.txt
 install_log.txt
 padLog.txt
-GS_opengl_debug_hw.txt
-GS_opengl_debug_sw.txt
+GSdx_opengl_debug_hw.txt
+GSdx_opengl_debug_sw.txt
 
 Debug
 Release
@@ -77,7 +76,7 @@ oprofile_data/
 /bin/PCSX2-linux.sh
 /bin/*ReplayLoader
 /bin/PCSX2-linux.sh
-/bin/GS*.txt
+/bin/GSdx*.txt
 /bin/bios
 /bin/dumps
 /bin/help
@@ -109,7 +108,10 @@ oprofile_data/
 /3rdparty/**/wx/msw/rcdefs.h
 /pcsx2/gui/Resources/*.h
 !/pcsx2/gui/Resources/EmbeddedImage.h
+/plugins/GSdx/Template
 /tools/bin
 .vs
 
+/pcsx2/windows/VCprojects/GSdx_opengl_debug_hw.txt
+/pcsx2/windows/VCprojects/GSdx_opengl_debug_sw.txt
 /out/build/x64-Debug (default)

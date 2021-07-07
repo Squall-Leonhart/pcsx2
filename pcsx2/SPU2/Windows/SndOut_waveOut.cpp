@@ -14,7 +14,7 @@
  */
 
 #include "PrecompiledHeader.h"
-#include "SPU2/Global.h"
+#include "../Global.h"
 #include "Dialogs.h"
 
 

@@ -19,6 +19,7 @@
 #include "pxEventThread.h"
 
 #include "AppCommon.h"
+#include "AppCorePlugins.h"
 #include "SaveState.h"
 
 #define AffinityAssert_AllowFrom_CoreThread() \
@@ -151,6 +152,7 @@ public:
 	virtual void ChangeCdvdSource();
 
 	virtual void ApplySettings(const Pcsx2Config& src);
+	virtual void UploadStateCopy(const VmStateBuffer& copy);
 
 protected:
 	virtual void DoCpuExecute();
@@ -233,6 +235,8 @@ class ScopedCoreThreadClose : public BaseScopedCoreThread
 public:
 	ScopedCoreThreadClose();
 	virtual ~ScopedCoreThreadClose();
+
+	void LoadPlugins();
 };
 
 struct ScopedCoreThreadPause : public BaseScopedCoreThread

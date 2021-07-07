@@ -24,6 +24,7 @@
 #include "Utilities/Console.h"
 #include <stdio.h>
 #include <assert.h>
+#include "PS2Edefs.h"
 
 #include <array>
 #include <vector>
@@ -33,7 +34,6 @@
 #include <mutex>
 #include <queue>
 
-#include "App.h"
 
 typedef struct
 {
@@ -56,3 +56,5 @@ void PADconfigure();
 s32 PADfreeze(int mode, freezeData* data);
 s32 PADsetSlot(u8 port, u8 slot);
 void PADsetSettingsDir(const char* dir);
+void PADDoFreezeOut(void* dest);
+void PADDoFreezeIn(pxInputStream& infp);

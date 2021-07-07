@@ -7,7 +7,8 @@
 //------------------------------------------------------------------------------
 
 
-#pragma once
+#ifndef __WXDEBUG__
+#define __WXDEBUG__
 
 // This library provides fairly straight forward debugging functionality, this
 // is split into two main sections. The first is assertion handling, there are
@@ -352,3 +353,7 @@ public:
 #define AMTRACEFN()
 
 #endif
+
+#endif // __WXDEBUG__
+
+

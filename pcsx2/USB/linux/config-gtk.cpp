@@ -21,15 +21,15 @@
 #include <vector>
 #include <string>
 #include "AppCoreThread.h"
-#include "USB/gtk.h"
+#include "../gtk.h"
 
-#include "USB/configuration.h"
-#include "USB/deviceproxy.h"
-#include "USB/usb-pad/padproxy.h"
-#include "USB/usb-mic/audiodeviceproxy.h"
+#include "../configuration.h"
+#include "../deviceproxy.h"
+#include "../usb-pad/padproxy.h"
+#include "../usb-mic/audiodeviceproxy.h"
 
 #include "config.h"
-#include "USB/USB.h"
+#include "../USB.h"
 
 struct SettingsCB
 {

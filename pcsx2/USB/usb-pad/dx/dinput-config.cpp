@@ -28,7 +28,7 @@
 #include "versionproxy.h"
 
 #include "usb-pad-dx.h"
-#include "USB/shared/inifile_usb.h"
+#include "../../shared/inifile_usb.h"
 
 namespace usb_pad
 {

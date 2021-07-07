@@ -15,7 +15,7 @@
 
 #include "PrecompiledHeader.h"
 
-#include "DEV9/pcap_io.h"
+#include "../pcap_io.h"
 
 HMODULE hpcap = nullptr;
 

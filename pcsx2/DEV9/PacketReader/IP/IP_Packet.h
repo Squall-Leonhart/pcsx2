@@ -16,7 +16,7 @@
 #pragma once
 #include <vector>
 
-#include "DEV9/PacketReader/Payload.h"
+#include "../Payload.h"
 #include "IP_Address.h"
 #include "IP_Options.h"
 #include "IP_Payload.h"

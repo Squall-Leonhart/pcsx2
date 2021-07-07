@@ -17,7 +17,7 @@
 
 #include <wchar.h>
 #include <vector>
-#include "USB/platcompat.h"
+#include "../platcompat.h"
 
 /* binary representation */
 PACK(

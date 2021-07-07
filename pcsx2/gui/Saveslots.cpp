@@ -72,6 +72,7 @@ void States_FreezeCurrentSlot()
 		return;
 	}
 
+	GSchangeSaveState(StatesC, SaveStateBase::GetFilename(StatesC).ToUTF8());
 	StateCopy_SaveToSlot(StatesC);
 
 #ifdef USE_NEW_SAVESLOTS_UI
@@ -97,6 +98,7 @@ void _States_DefrostCurrentSlot(bool isFromBackup)
 		return;
 	}
 
+	GSchangeSaveState(StatesC, SaveStateBase::GetFilename(StatesC).ToUTF8());
 	StateCopy_LoadFromSlot(StatesC, isFromBackup);
 
 	GetSysExecutorThread().PostIdleEvent(SysExecEvent_ClearSavingLoadingFlag());
@@ -125,6 +127,10 @@ void States_updateLoadBackupMenuItem()
 static void OnSlotChanged()
 {
 	OSDlog(Color_StrongGreen, true, " > Selected savestate slot %d", StatesC);
+
+	if (GSchangeSaveState != NULL)
+		GSchangeSaveState(StatesC, SaveStateBase::GetFilename(StatesC).utf8_str());
+
 	States_updateLoadBackupMenuItem();
 }
 

@@ -128,5 +128,7 @@ extern Window GSwin;
 #include <Dbt.h>
 #endif
 
+#include "PS2Edefs.h"
+
 // Needed for config screen
 void GetNameAndVersionString(wchar_t* out);

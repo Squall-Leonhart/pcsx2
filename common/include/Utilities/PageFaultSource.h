@@ -25,7 +25,6 @@
 // [TODO] OS-X (Darwin) platforms should use the Mach exception model (not implemented)
 
 #include "EventSource.h"
-#include "General.h"
 #include <atomic>
 
 struct PageFaultInfo

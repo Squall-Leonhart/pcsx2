@@ -34,36 +34,37 @@ struct _mcd
 	u32 ForceEjection_Timeout; // in SIO checks
 	wxDateTime ForceEjection_Timestamp;
 
-	void GetSizeInfo(McdSizeInfo &info)
+
+	void GetSizeInfo(PS2E_McdSizeInfo &info)
 	{
-		FileMcd_GetSizeInfo(port, slot, &info);
+		SysPlugins.McdGetSizeInfo(port, slot, info);
 	}
 
 	bool IsPSX()
 	{
-		return FileMcd_IsPSX(port, slot);
+		return SysPlugins.McdIsPSX(port, slot);
 	}
 
 	void EraseBlock()
 	{
-		FileMcd_EraseBlock(port, slot, transferAddr);
+		SysPlugins.McdEraseBlock(port, slot, transferAddr);
 	}
 
 	// Read from memorycard to dest
 	void Read(u8 *dest, int size) 
 	{
-		FileMcd_Read(port, slot, dest, transferAddr, size);
+		SysPlugins.McdRead(port, slot, dest, transferAddr, size);
 	}
 
 	// Write to memorycard from src
 	void Write(u8 *src, int size) 
 	{
-		FileMcd_Save(port, slot, src,transferAddr, size);
+		SysPlugins.McdSave(port, slot, src,transferAddr, size);
 	}
 
 	bool IsPresent()
 	{
-		return FileMcd_IsPresent(port, slot);
+		return SysPlugins.McdIsPresent(port, slot);
 	}
 
 	u8 DoXor(const u8 *buf, uint length)
@@ -75,15 +76,15 @@ struct _mcd
 
 	u64 GetChecksum()
 	{
-		return FileMcd_GetCRC(port, slot);
+		return SysPlugins.McdGetCRC(port, slot);
 	}
 
 	void NextFrame() {
-		FileMcd_NextFrame( port, slot );
+		SysPlugins.McdNextFrame( port, slot );
 	}
 
 	bool ReIndex(const wxString& filter = L"") {
-		return FileMcd_ReIndex(port, slot, filter);
+		return SysPlugins.McdReIndex( port, slot, filter );
 	}
 };
 

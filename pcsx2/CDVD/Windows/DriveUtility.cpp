@@ -14,7 +14,7 @@
  */
 
 #include "PrecompiledHeader.h"
-#include "CDVD/CDVDdiscReader.h"
+#include "../CDVDdiscReader.h"
 
 std::vector<std::wstring> GetOpticalDriveList()
 {

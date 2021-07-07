@@ -22,8 +22,8 @@
 #include <algorithm>
 #include <iterator>
 #include "usb-pad.h"
-#include "USB/helpers.h"
-#include "USB/deviceproxy.h"
+#include "../helpers.h"
+#include "../deviceproxy.h"
 
 namespace usb_pad
 {

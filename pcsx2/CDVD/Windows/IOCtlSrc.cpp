@@ -14,7 +14,7 @@
  */
 
 #include "PrecompiledHeader.h"
-#include "CDVD/CDVDdiscReader.h"
+#include "../CDVDdiscReader.h"
 
 #include <winioctl.h>
 #include <ntddcdvd.h>

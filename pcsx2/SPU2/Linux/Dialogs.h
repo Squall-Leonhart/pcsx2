@@ -16,8 +16,8 @@
 #ifndef DIALOG_H_INCLUDED
 #define DIALOG_H_INCLUDED
 
-#include "SPU2/Global.h"
-#include "SPU2/Config.h"
+#include "../Global.h"
+#include "../Config.h"
 
 namespace DebugConfig
 {

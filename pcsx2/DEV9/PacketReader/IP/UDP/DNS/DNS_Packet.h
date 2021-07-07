@@ -18,7 +18,7 @@
 
 #include "DNS_Classes.h"
 #include "DNS_Enums.h"
-#include "DEV9/PacketReader/Payload.h"
+#include "../../../Payload.h"
 
 namespace PacketReader::IP::UDP::DNS
 {

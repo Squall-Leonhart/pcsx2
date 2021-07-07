@@ -15,7 +15,7 @@
 
 #include "PrecompiledHeader.h"
 #include "DHCP_Packet.h"
-#include "DEV9/PacketReader/NetLib.h"
+#include "../../../NetLib.h"
 
 namespace PacketReader::IP::UDP::DHCP
 {

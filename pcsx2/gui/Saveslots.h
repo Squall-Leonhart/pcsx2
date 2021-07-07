@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "PS2Edefs.h"
 #include "System.h"
 #include "Elfheader.h"
 #include "App.h"

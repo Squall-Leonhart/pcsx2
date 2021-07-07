@@ -16,22 +16,21 @@
 #include "PrecompiledHeader.h"
 #include <stdio.h>
 #include <commdlg.h>
-#include <commctrl.h>
 
 #include <string>
 #include "ghc/filesystem.h"
 #include "fmt/format.h"
 
-#include "DEV9/Config.h"
+#include "..\Config.h"
 #include "resource.h"
-#include "DEV9/DEV9.h"
-#include "DEV9/pcap_io.h"
-#include "DEV9/net.h"
-#include "DEV9/PacketReader\IP\IP_Address.h"
+#include "..\DEV9.h"
+#include "..\pcap_io.h"
+#include "..\net.h"
+#include "..\PacketReader\IP\IP_Address.h"
 #include "tap.h"
 #include "AppCoreThread.h"
 
-#include "DEV9/ATA/HddCreate.h"
+#include "../ATA/HddCreate.h"
 
 using PacketReader::IP::IP_Address;
 

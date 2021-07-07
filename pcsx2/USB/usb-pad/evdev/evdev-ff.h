@@ -17,7 +17,7 @@
 #define EVDEV_FF_H
 
 #include <linux/input.h>
-#include "USB/usb-pad/usb-pad.h"
+#include "../usb-pad.h"
 
 namespace usb_pad
 {

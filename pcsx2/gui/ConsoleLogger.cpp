@@ -1265,13 +1265,16 @@ void Pcsx2App::DisableWindowLogging() const
 
 void OSDlog(ConsoleColors color, bool console, const std::string& str)
 {
-	GSosdLog(str.c_str(), wxGetApp().GetProgramLog()->GetRGBA(color));
+	if (GSosdLog)
+		GSosdLog(str.c_str(), wxGetApp().GetProgramLog()->GetRGBA(color));
 
 	if (console)
 		Console.WriteLn(color, str.c_str());
 }
 
 void OSDmonitor(ConsoleColors color, const std::string key, const std::string value) {
+	if(!GSosdMonitor) return;
+
 	GSosdMonitor(wxString(key).utf8_str(), wxString(value).utf8_str(), wxGetApp().GetProgramLog()->GetRGBA(color));
 }
 

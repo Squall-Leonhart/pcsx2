@@ -14,7 +14,7 @@
  */
 
 #include "PrecompiledHeader.h"
-#include "CDVD/CDVDdiscReader.h"
+#include "../CDVDdiscReader.h"
 
 #ifdef __linux__
 #include <libudev.h>

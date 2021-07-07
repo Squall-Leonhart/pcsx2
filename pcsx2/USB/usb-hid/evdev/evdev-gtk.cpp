@@ -13,10 +13,10 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "USB/usb-hid/usb-hid.h"
+#include "../usb-hid.h"
 #include "evdev.h"
 #include <linux/input.h>
-#include "USB/gtk.h"
+#include "../../gtk.h"
 #include <cstdio>
 #include <sstream>
 

@@ -15,7 +15,7 @@
 
 #ifndef USBMICSINGSTAR_H
 #define USBMICSINGSTAR_H
-#include "USB/deviceproxy.h"
+#include "../deviceproxy.h"
 #include "audiodeviceproxy.h"
 
 struct USBDevice;

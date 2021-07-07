@@ -135,7 +135,7 @@ struct KeyAcceleratorCode
 // --------------------------------------------------------------------------------------
 //  GlobalCommandDescriptor
 // --------------------------------------------------------------------------------------
-//  Describes a global command which can be invoked from the main GUI.
+//  Describes a global command which can be invoked from the main GUI or GUI plugins.
 
 struct GlobalCommandDescriptor
 {

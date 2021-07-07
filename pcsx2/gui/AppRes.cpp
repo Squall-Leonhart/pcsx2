@@ -33,6 +33,7 @@
 #include "Resources/ConfigIcon_Speedhacks.h"
 #include "Resources/ConfigIcon_Gamefixes.h"
 #include "Resources/ConfigIcon_Paths.h"
+#include "Resources/ConfigIcon_Plugins.h"
 #include "Resources/ConfigIcon_MemoryCard.h"
 
 #include "Resources/AppIcon16.h"
@@ -146,6 +147,7 @@ wxImageList& Pcsx2App::GetImgList_Config()
 	}
 
 		FancyLoadMacro(Paths);
+		FancyLoadMacro(Plugins);
 		FancyLoadMacro(Gamefixes);
 		FancyLoadMacro(Speedhacks);
 		FancyLoadMacro(MemoryCard);

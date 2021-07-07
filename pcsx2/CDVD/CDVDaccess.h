@@ -118,7 +118,11 @@ struct CDVD_API
 {
 	void(CALLBACK* close)();
 
-	// Don't need init or shutdown.  iso/nodisc have no init/shutdown.
+	// Don't need init or shutdown.  iso/nodisc have no init/shutdown and plugin's
+	// is handled by the PluginManager.
+
+	// Don't need plugin specific things like freeze, test, or other stuff here.
+	// Those are handled by the plugin manager specifically.
 
 	_CDVDopen open;
 	_CDVDreadTrack readTrack;
@@ -139,7 +143,8 @@ struct CDVD_API
 };
 
 // ----------------------------------------------------------------------------
-//   Multiple interface system for CDVD. 
+//   Multiple interface system for CDVD. Do* functions are meant as replacements
+//   for direct CDVD plugin invocation, and add universal block dumping features.
 // ----------------------------------------------------------------------------
 
 extern CDVD_API* CDVD; // currently active CDVD access mode api (either Iso, NoDisc, or Disc)

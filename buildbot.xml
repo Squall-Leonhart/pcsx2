@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="ReleaseAll" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Add all the projects that use the non-standard configurations here. -->
+  <ItemGroup>
+    <TargetsSetCPU Include="plugins\GSdx"/>
+  </ItemGroup>
   <!-- Add all the solutions here. -->
   <ItemGroup>
     <SolutionSet Include="$(MSBuildProjectDirectory)\PCSX2_suite.sln" />
@@ -51,7 +55,8 @@
       <BaseConfiguration>Debug</BaseConfiguration>
     </PropertyGroup>
     <ItemGroup>
-      <ConfigCPU Include="Debug AVX2;Debug"/>
+      <ConfigCPU Include="Debug"/>
+      <!--ConfigCPU Include="Debug AVX2;Debug"/-->
     </ItemGroup>
   </Target>
   <Target Name="DevelAll">
@@ -59,7 +64,8 @@
       <BaseConfiguration>Devel</BaseConfiguration>
     </PropertyGroup>
     <ItemGroup>
-      <ConfigCPU Include="Devel AVX2;Devel"/>
+      <ConfigCPU Include="Devel"/>
+      <!--ConfigCPU Include="Devel AVX2;Devel"/-->
     </ItemGroup>
   </Target>
   <Target Name="ReleaseAll">

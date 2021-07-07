@@ -16,7 +16,7 @@
 #include "PrecompiledHeader.h"
 
 #include "IP_Options.h"
-#include "DEV9/PacketReader/NetLib.h"
+#include "../NetLib.h"
 
 namespace PacketReader::IP
 {
