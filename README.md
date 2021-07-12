@@ -1,4 +1,4 @@
-# PCSX2
+# PCSX2 for Windows 7
 
 ![Windows Build Status](https://img.shields.io/github/workflow/status/PCSX2/pcsx2/%F0%9F%96%A5%EF%B8%8F%20Windows%20Builds/master?label=Windows%20Builds)
 ![Linux Build Status](https://img.shields.io/github/workflow/status/PCSX2/pcsx2/%F0%9F%90%A7%20Linux%20Builds/master?label=Linux%20Builds)
