@@ -38,6 +38,7 @@ _Note: Recommended GPU is based on 3x Internal, ~1080p resolution requirements. 
 ### Technical Notes
 
 -   You need the [Visual C++ 2019 x86 Redistributables](https://support.microsoft.com/en-us/help/2977003/) to run PCSX2.
+-   You need Xaudio 2.8 or newer, [Windows 7 users can run this installable](https://cdn.discordapp.com/attachments/364096655617949709/753590606177108038/Xaudio_2.8_and_2.9_installer_for_Windows_7.exe) to obtain it.
 -   Windows XP and Direct3D9 support was dropped after stable release 1.4.0.
 -   Make sure to update your operating system and drivers to ensure you have the best experience possible. Having a newer GPU is also recommended so you have the latest supported drivers.
 -   Because of copyright issues, and the complexity of trying to work around it, you need a BIOS dump extracted from a legitimately-owned PS2 console to use the emulator. For more information about the BIOS and how to get it from your console, visit [this page](https://pcsx2.net/config-guide.html#Bios).
