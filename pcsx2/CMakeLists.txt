@@ -394,7 +394,8 @@ set(pcsx2USBSources
 	USB/usb-mic/usb-mic-singstar.cpp
 	USB/usb-mic/usb-mic-logitech.cpp
 	USB/usb-mic/usb-headset.cpp
-	USB/usb-eyetoy/jpgd/jpgd.cpp
+	../3rdparty/jpgd/jpgd.cpp
+	../3rdparty/jpgd/jpge.cpp
 	USB/usb-eyetoy/jo_mpeg.cpp
 	USB/usb-eyetoy/usb-eyetoy-webcam.cpp
 	USB/usb-hid/usb-hid.cpp
@@ -448,7 +449,8 @@ set(pcsx2USBHeaders
 	USB/usb-mic/usb-mic-singstar.h
 	USB/usb-mic/usb-headset.h
 	USB/usb-mic/audiodev-noop.h
-	USB/usb-eyetoy/jpgd/jpgd.h
+	../3rdparty/jpgd/jpgd.h
+	../3rdparty/jpgd/jpge.h
 	USB/usb-eyetoy/jo_mpeg.h
 	USB/usb-eyetoy/videodeviceproxy.h
 	USB/usb-eyetoy/videodev.h
@@ -474,6 +476,7 @@ set(pcsx2USBHeaders
 	USB/usb-eyetoy/cam-linux.h
 	USB/qemu-usb/input-keymap-linux-to-qcode.h
     )
+include_directories ("../3rdparty/jpgd/")
 
 if(PULSEAUDIO_FOUND)
     set(pcsx2USBSources ${pcsx2USBSources} USB/usb-mic/audiodev-pulse.cpp)
